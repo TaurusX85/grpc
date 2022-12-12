@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package taurusx85;
+
+option java_package = "com.taurusx85.grpc.user";
+option java_multiple_files = true;
+
+message UserInput {
+    int32 id = 1;
+    string name = 2;
+}
+
+message UserOutput {
+
+}
+
+service UserService {
+    rpc create(UserInput) returns (UserOutput);
+}
