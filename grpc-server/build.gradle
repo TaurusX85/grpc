@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+dependencies {
+    // GRPC
+    implementation project(':grpc-common')
+    implementation 'net.devh:grpc-server-spring-boot-starter:2.13.1.RELEASE'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.20'
+    annotationProcessor 'org.projectlombok:lombok:1.18.20'
+}

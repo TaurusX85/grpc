@@ -1,0 +1,53 @@
+buildscript {
+    ext {
+        protobufVersion = '3.14.0'
+        protobufPluginVersion = '0.8.14'
+        grpcVersion = '1.39.0'
+    }
+}
+
+plugins {
+    id 'java'
+    id 'com.google.protobuf' version "${protobufPluginVersion}"
+}
+
+group 'com.taurusx85.grpc'
+version '1.0'
+
+sourceCompatibility = 1.8
+
+dependencies {
+    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+    implementation "io.grpc:grpc-stub:${grpcVersion}"
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:${protobufVersion}"
+    }
+    generatedFilesBaseDir = "$projectDir/generated"
+    clean {
+        delete generatedFilesBaseDir
+    }
+    plugins {
+        grpc {
+            artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}"
+        }
+    }
+    generateProtoTasks {
+        all()*.plugins {
+            grpc {}
+        }
+    }
+}
+
+// Inform IDEs like IntelliJ IDEA, Eclipse or NetBeans about the generated code.
+sourceSets {
+    main {
+        java {
+            srcDir "${buildDir}/generated/source/proto/main/java"
+            srcDir "${buildDir}/generated/source/proto/main/grpc"
+        }
+    }
+}
+
