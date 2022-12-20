@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("user")
 public class UserController {
@@ -21,21 +23,45 @@ public class UserController {
     }
 
 
+    // unidirectional synchronous
     @PostMapping
     public ResponseEntity<Integer> create(@RequestBody UserCreationInput input) {
         Integer id = userService.create(input.getName());
         return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 
+    // unidirectional synchronous
     @GetMapping("{id}")
     public ResponseEntity<UserDTO> getById(@PathVariable Integer id) {
         UserDTO user = userService.getById(id);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
+    // unidirectional asynchronous
     @PostMapping("{id}/notify")
     public ResponseEntity notifyUser(@PathVariable Integer id, @RequestBody NotificationInput input) {
         userService.notifyUser(id, input);
         return new ResponseEntity(HttpStatus.OK);
     }
+
+    // bidirectional streaming
+    @PostMapping("multiple")
+    public ResponseEntity<List<Integer>> create(@RequestBody List<UserCreationInput> input) {
+        List<Integer> ids = userService.createMultiple(input);
+        return new ResponseEntity<>(ids, HttpStatus.CREATED);
+    }
+
+    // unidirectional server-side streaming
+    @GetMapping("all")
+    public ResponseEntity<List<UserDTO>> getAll() {
+        return new ResponseEntity<>(userService.getAll(), HttpStatus.OK);
+    }
+
+    // unidirectional client-side streaming
+    @DeleteMapping("multiple")
+    public ResponseEntity deleteMultiple(@RequestParam List<Integer> ids) {
+        userService.deleteMultiple(ids);
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
 }

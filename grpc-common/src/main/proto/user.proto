@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "google/protobuf/empty.proto";
+
 package taurusx85;
 
 option java_package = "com.taurusx85.grpc.user";
@@ -18,7 +20,15 @@ message UserMessage {
     string name = 2;
 }
 
+message DeletedUsers {
+    repeated int32 ids = 1;
+}
+
 service UserService {
     rpc create(UserInput) returns (UserId);
     rpc getById(UserId) returns (UserMessage);
+
+    rpc createMultiple(stream UserInput) returns (stream UserId);
+    rpc getAll(google.protobuf.Empty) returns (stream UserMessage);
+    rpc deleteMultiple(stream UserId) returns (DeletedUsers);
 }

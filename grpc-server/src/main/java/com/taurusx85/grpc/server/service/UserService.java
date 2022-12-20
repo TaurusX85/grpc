@@ -1,5 +1,6 @@
 package com.taurusx85.grpc.server.service;
 
+import com.google.protobuf.Empty;
 import com.google.rpc.Code;
 import com.google.rpc.Status;
 import com.taurusx85.grpc.server.entity.User;
@@ -54,8 +55,24 @@ public class UserService extends UserServiceImplBase {
         responseObserver.onCompleted();
     }
 
+    @Override
+    public void getAll(Empty request, StreamObserver<UserMessage> responseObserver) {
+        try {
+            for (User user : users) {
+                responseObserver.onNext(toUser(user));
+            }
+        } catch (Exception e) {
+            responseObserver.onError(e);
+        }
+        responseObserver.onCompleted();
+    }
 
-//    ====================== PRIVATE ==================
+    @Override
+    public StreamObserver<UserId> deleteMultiple(StreamObserver<DeletedUsers> responseObserver) {
+        return new DeletedUsersStreamObserver(responseObserver);
+    }
+
+    //    ====================== PRIVATE ==================
 
     private int createUser(String name) {
         if (users.stream().anyMatch(user -> user.getName().equals(name)))
@@ -75,4 +92,35 @@ public class UserService extends UserServiceImplBase {
                           .build();
     }
 
+    private class DeletedUsersStreamObserver implements StreamObserver<UserId> {
+
+        private final List<Integer> removedUsersIdList = new ArrayList<>();
+        private final StreamObserver<DeletedUsers> responseObserver;
+
+        DeletedUsersStreamObserver(StreamObserver<DeletedUsers> responseObserver) {
+            this.responseObserver = responseObserver;
+        }
+
+        @Override
+        public void onNext(UserId value) {
+            boolean removed = users.removeIf(user -> user.getId() == value.getId());
+            if (removed)
+                removedUsersIdList.add(value.getId());
+        }
+
+        @Override
+        public void onError(Throwable t) {
+            // exception on client side - not required
+            // connection broken ??
+        }
+
+        @Override
+        public void onCompleted() {
+            // client completed to send
+            responseObserver.onNext(DeletedUsers.newBuilder()
+                                                .addAllIds(removedUsersIdList)
+                                                .build());
+            responseObserver.onCompleted();
+        }
+    }
 }
