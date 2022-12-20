@@ -1,6 +1,10 @@
 plugins {
     id 'java'
+    id 'org.springframework.boot' version '2.5.4'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 }
+
+sourceCompatibility = '11'
 
 configurations {
     compileOnly {
@@ -8,10 +12,21 @@ configurations {
     }
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
+    
+    // Spring
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
     // GRPC
     implementation project(':grpc-common')
     implementation 'net.devh:grpc-client-spring-boot-starter:2.13.1.RELEASE'
+
+    // Util
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok:1.18.20'

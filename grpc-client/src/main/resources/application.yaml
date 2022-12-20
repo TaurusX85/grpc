@@ -1,14 +1,16 @@
+server:
+  port: 8080
+
 grpc:
   client:
     GLOBAL:
       negotiationType: PLAINTEXT
-      enable-keep-alive: true
-      keep-alive-timeout: 20s
-      keep-alive-time: 60s
-      keep-alive-without-calls: true
-#      address: static://${SERVER_IP:localhost}:${SERVER_PORT:9090}
-  destination:
-    port: ${SERVER_PORT:9090}
+    local-server:
+      address: static://${SERVER_IP:localhost}:${SERVER_PORT:9090}
+
+local-server:
+  url: ${SERVER_IP:localhost}
+  port: ${SERVER_PORT:9090}
 
 spring:
   application:
@@ -17,11 +19,6 @@ spring:
 logging:
   level:
     io.grpc: INFO
-  file:
-    name: ${LOG_PATH}${spring.application.name}.log
+    com.taurusx85: DEBUG
   pattern:
     console: "%d{HH:mm:ss.SSS dd/MM/yyyy} %clr(%-5level) %clr([%thread]){blue} %logger{60} %clr([%X{requestId}]){cyan} --- %msg %n"
-    file:    "%d{HH:mm:ss.SSS dd/MM/yyyy} %-5level [%thread] %logger{60} [%X{requestId}] --- %msg %n"
-  logback:
-    rollingpolicy:
-      max-history: 7

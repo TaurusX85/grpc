@@ -1,11 +1,18 @@
 plugins {
     id 'java'
+    id 'org.springframework.boot' version '2.5.4'
 }
+
+sourceCompatibility = '11'
 
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+}
+
+repositories {
+    mavenCentral()
 }
 
 dependencies {

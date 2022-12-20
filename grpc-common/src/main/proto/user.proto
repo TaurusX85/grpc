@@ -6,14 +6,19 @@ option java_package = "com.taurusx85.grpc.user";
 option java_multiple_files = true;
 
 message UserInput {
+    string name = 1;
+}
+
+message UserId {
+    int32 id = 1;
+}
+
+message UserMessage {
     int32 id = 1;
     string name = 2;
 }
 
-message UserOutput {
-
-}
-
 service UserService {
-    rpc create(UserInput) returns (UserOutput);
+    rpc create(UserInput) returns (UserId);
+    rpc getById(UserId) returns (UserMessage);
 }

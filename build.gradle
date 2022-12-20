@@ -1,16 +1,7 @@
-plugins {
-    id 'java'
-}
 
 allprojects {
     group 'com.taurusx85.grpc'
     version '1.0'
-
-    sourceCompatibility = '11'
-
-    repositories {
-        mavenCentral()
-    }
 
 }
 
