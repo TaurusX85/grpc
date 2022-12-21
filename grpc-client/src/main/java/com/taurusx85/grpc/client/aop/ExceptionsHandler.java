@@ -35,7 +35,7 @@ public class ExceptionsHandler extends ResponseEntityExceptionHandler {
 
 
     @ExceptionHandler
-    ResponseEntity<ApiError> handleRuntimeException(RuntimeException e) {
+    ResponseEntity<ApiError> handleCommonException(Exception e) {
         ApiError apiError = new ApiError(e.getMessage(), getRequestId());
         return new ResponseEntity<>(apiError, INTERNAL_SERVER_ERROR);
     }

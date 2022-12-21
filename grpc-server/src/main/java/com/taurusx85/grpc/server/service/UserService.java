@@ -56,6 +56,11 @@ public class UserService extends UserServiceImplBase {
     }
 
     @Override
+    public StreamObserver<UserInput> createMultiple(StreamObserver<UserId> responseObserver) {
+        return new CreateUserStreamObserver(responseObserver);
+    }
+
+    @Override
     public void getAll(Empty request, StreamObserver<UserMessage> responseObserver) {
         try {
             for (User user : users) {
@@ -76,7 +81,7 @@ public class UserService extends UserServiceImplBase {
 
     private int createUser(String name) {
         if (users.stream().anyMatch(user -> user.getName().equals(name)))
-            throw new RuntimeException("Already exists");
+            throw new RuntimeException("User with name: " + name + " already exists");
 
         User user = new User();
         user.setId(new Random().nextInt(Integer.MAX_VALUE));
@@ -103,9 +108,14 @@ public class UserService extends UserServiceImplBase {
 
         @Override
         public void onNext(UserId value) {
-            boolean removed = users.removeIf(user -> user.getId() == value.getId());
-            if (removed)
-                removedUsersIdList.add(value.getId());
+            try {
+                boolean removed = users.removeIf(user -> user.getId() == value.getId());
+                if (removed)
+                    removedUsersIdList.add(value.getId());
+            } catch (Exception e) {
+                log.error(e.toString());
+                responseObserver.onError(e);
+            }
         }
 
         @Override
@@ -116,10 +126,41 @@ public class UserService extends UserServiceImplBase {
 
         @Override
         public void onCompleted() {
-            // client completed to send
             responseObserver.onNext(DeletedUsers.newBuilder()
                                                 .addAllIds(removedUsersIdList)
                                                 .build());
+            responseObserver.onCompleted();
+        }
+    }
+
+    private class CreateUserStreamObserver implements StreamObserver<UserInput> {
+
+        private final StreamObserver<UserId> responseObserver;
+
+        CreateUserStreamObserver(StreamObserver<UserId> responseObserver) {
+            this.responseObserver = responseObserver;
+        }
+
+        @Override
+        public void onNext(UserInput value) {
+            try {
+                int id = createUser(value.getName());
+                responseObserver.onNext(UserId.newBuilder()
+                                              .setId(id)
+                                              .build());
+            } catch (Exception e) {
+                log.error(e.toString());
+                responseObserver.onError(e);
+            }
+        }
+
+        @Override
+        public void onError(Throwable t) {
+            responseObserver.onError(t);
+        }
+
+        @Override
+        public void onCompleted() {
             responseObserver.onCompleted();
         }
     }

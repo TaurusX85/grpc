@@ -8,6 +8,7 @@ import com.taurusx85.grpc.client.config.GrpcChannelManager;
 import com.taurusx85.grpc.client.dto.input.NotificationInput;
 import com.taurusx85.grpc.client.dto.input.UserCreationInput;
 import com.taurusx85.grpc.client.dto.output.UserDTO;
+import com.taurusx85.grpc.client.exception.StreamExecutionException;
 import com.taurusx85.grpc.user.*;
 import com.taurusx85.grpc.user.UserServiceGrpc.UserServiceStub;
 import com.taurusx85.grpc.user.UserServiceGrpc.UserServiceImplBase;
@@ -76,7 +77,19 @@ public class UserService extends UserServiceImplBase  {
     }
 
     public List<Integer> createMultiple(List<UserCreationInput> input) {
-
+        CompletableFuture<List<Integer>> createdUserIdList = new CompletableFuture<>();
+        StreamObserver<UserInput> inputStream = streamingStub.createMultiple(new CreatedUserIdStreamObserver(createdUserIdList));
+        for (UserCreationInput userInput : input) {
+            inputStream.onNext(UserInput.newBuilder()
+                                        .setName(userInput.getName())
+                                        .build());
+        }
+        inputStream.onCompleted();
+        try {
+            return createdUserIdList.get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new StreamExecutionException(e);
+        }
     }
 
     public List<UserDTO> getAll() {
@@ -85,7 +98,7 @@ public class UserService extends UserServiceImplBase  {
         try {
             return allUsersResponse.get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
+            throw new StreamExecutionException(e);
         }
     }
 
@@ -105,7 +118,7 @@ public class UserService extends UserServiceImplBase  {
             List<Integer> deletedUsersIdList = future.get();
             log.info(deletedUsersIdList.toString());
         } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
+            throw new StreamExecutionException(e);
         }
     }
 
@@ -131,10 +144,11 @@ public class UserService extends UserServiceImplBase  {
     private static class GetAllUsersStreamObserver implements StreamObserver<UserMessage> {
 
         private CompletableFuture<List<UserDTO>> future;
-        private List<UserDTO> users = new ArrayList<>();
+        private List<UserDTO> users;
 
         GetAllUsersStreamObserver(CompletableFuture<List<UserDTO>> allUsersResponse) {
             this.future = allUsersResponse;
+            this.users = new ArrayList<>();
         }
 
         @Override
@@ -156,11 +170,11 @@ public class UserService extends UserServiceImplBase  {
     private static class DeletedUsersStreamObserver implements StreamObserver<DeletedUsers> {
 
         private final CompletableFuture<List<Integer>> future;
-        List<Integer> deletedUsers;
+        private List<Integer> deletedUsers;
 
         DeletedUsersStreamObserver(CompletableFuture<List<Integer>> future) {
             this.future = future;
-            deletedUsers = new ArrayList<>();
+            this.deletedUsers = new ArrayList<>();
         }
 
         @Override
@@ -176,6 +190,32 @@ public class UserService extends UserServiceImplBase  {
         @Override
         public void onCompleted() {
             future.complete(deletedUsers);
+        }
+    }
+
+    private static class CreatedUserIdStreamObserver implements StreamObserver<UserId> {
+
+        private CompletableFuture<List<Integer>> future;
+        private List<Integer> createdUserIdList;
+
+        CreatedUserIdStreamObserver(CompletableFuture<List<Integer>> future) {
+            this.future = future;
+            this.createdUserIdList = new ArrayList<>();
+        }
+
+        @Override
+        public void onNext(UserId value) {
+            createdUserIdList.add(value.getId());
+        }
+
+        @Override
+        public void onError(Throwable t) {
+            future.completeExceptionally(t);
+        }
+
+        @Override
+        public void onCompleted() {
+            future.complete(createdUserIdList);
         }
     }
 }
