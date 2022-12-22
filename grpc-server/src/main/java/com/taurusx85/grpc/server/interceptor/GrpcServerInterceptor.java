@@ -16,7 +16,6 @@ public class GrpcServerInterceptor implements ServerInterceptor {
     @Override
     public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> call, Metadata headers, ServerCallHandler<ReqT, RespT> next) {
         String grpcMethodName = call.getMethodDescriptor().getFullMethodName();
-        log.debug(grpcMethodName + " - " + headers);
 
         Context newContext = Context.current()
                                     .withValue(REQUEST_CONTEXT,  headers.get(REQUEST_ID_HEADER_KEY));
@@ -42,7 +41,7 @@ public class GrpcServerInterceptor implements ServerInterceptor {
         public void onHalfClose() {                 //  If stream - need to use  'onMessage'
             Context previous = setUpContext();
             try {
-                log.debug("Context is set for: '" + grpcMethodName);
+                log.debug("Called: '" + grpcMethodName);
                 super.onHalfClose();
             } catch (Exception e) {
                 log.error(e.toString());

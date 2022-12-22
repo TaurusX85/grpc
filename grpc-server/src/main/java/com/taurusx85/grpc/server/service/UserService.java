@@ -4,6 +4,7 @@ import com.google.protobuf.Empty;
 import com.google.rpc.Code;
 import com.google.rpc.Status;
 import com.taurusx85.grpc.server.entity.User;
+import com.taurusx85.grpc.server.exception.AlreadyExistsException;
 import com.taurusx85.grpc.server.exception.EntityNotFoundException;
 import com.taurusx85.grpc.user.*;
 import com.taurusx85.grpc.user.UserServiceGrpc.UserServiceImplBase;
@@ -35,7 +36,7 @@ public class UserService extends UserServiceImplBase {
                                           .build());
             responseObserver.onCompleted();
             log.info("Server - user ID: " + id);
-        } catch (Exception e) {
+        } catch (AlreadyExistsException e) {
             Status status = Status.newBuilder()
                                   .setCode(Code.ALREADY_EXISTS.getNumber())
                                   .setMessage("User with name: " + request.getName() + " already exists")
@@ -81,7 +82,7 @@ public class UserService extends UserServiceImplBase {
 
     private int createUser(String name) {
         if (users.stream().anyMatch(user -> user.getName().equals(name)))
-            throw new RuntimeException("User with name: " + name + " already exists");
+            throw new AlreadyExistsException("User with name: " + name + " already exists");
 
         User user = new User();
         user.setId(new Random().nextInt(Integer.MAX_VALUE));
@@ -148,7 +149,7 @@ public class UserService extends UserServiceImplBase {
                 responseObserver.onNext(UserId.newBuilder()
                                               .setId(id)
                                               .build());
-            } catch (Exception e) {
+            } catch (AlreadyExistsException e) {
                 log.error(e.toString());
                 responseObserver.onError(e);
             }

@@ -5,12 +5,14 @@ import com.taurusx85.grpc.client.dto.input.NotificationInput;
 import com.taurusx85.grpc.client.dto.input.UserCreationInput;
 import com.taurusx85.grpc.client.dto.output.UserDTO;
 import com.taurusx85.grpc.client.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("user")
 public class UserController {
@@ -46,8 +48,9 @@ public class UserController {
 
     // bidirectional streaming
     @PostMapping("multiple")
-    public ResponseEntity<List<Integer>> create(@RequestBody List<UserCreationInput> input) {
+    public ResponseEntity<List<Integer>> createMultiple(@RequestBody List<UserCreationInput> input) {
         List<Integer> ids = userService.createMultiple(input);
+        log.info("Created users: " + ids);
         return new ResponseEntity<>(ids, HttpStatus.CREATED);
     }
 

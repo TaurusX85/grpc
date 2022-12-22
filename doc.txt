@@ -1,0 +1,14 @@
+Java Spring Boot Grpc - an exhaustive example
+
+ * stream - if connection closed, does onError() called ??
+
+ * if onNext() called fast after onCompleted() - can onCompleted() be called before big onNext() finished to process?
+
+ lifecycle of stream
+
+
+ concurrent calls to onNext():
+                            - happens-before ?
+                            - shared resources ?
+                            - same OR different threads ?
+                            - context ?

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.rpc.Code;
 import com.google.rpc.Status;
 import com.taurusx85.grpc.client.exception.AlreadyExistsException;
+import com.taurusx85.grpc.client.exception.StreamExecutionException;
 import com.taurusx85.grpc.common.AppContext;
 import io.grpc.StatusRuntimeException;
 import io.grpc.protobuf.StatusProto;
@@ -43,6 +44,7 @@ public class ExceptionsHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler
     ResponseEntity<ApiError> handleStatusRuntimeException(StatusRuntimeException e) {
+        log.error(e.toString());
         ApiError apiError;
         Status status = StatusProto.fromThrowable(e);
         if (status == null) {
@@ -55,8 +57,6 @@ public class ExceptionsHandler extends ResponseEntityExceptionHandler {
         apiError = new ApiError(status.getMessage(), getRequestId());
         return new ResponseEntity<>(apiError, httpStatus);
     }
-
-
 
 
     @Getter

@@ -17,6 +17,7 @@ import com.taurusx85.grpc.user.UserServiceGrpc.UserServiceBlockingStub;
 import io.grpc.Context;
 import io.grpc.stub.StreamObserver;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
@@ -47,7 +48,6 @@ public class UserService extends UserServiceImplBase  {
 
 
     public Integer create(String name) {
-        log.info("Client - create user");
         return blockingStub.create(UserInput.newBuilder()
                                             .setName(name)
                                             .build())
@@ -76,6 +76,7 @@ public class UserService extends UserServiceImplBase  {
         }
     }
 
+    @SneakyThrows
     public List<Integer> createMultiple(List<UserCreationInput> input) {
         CompletableFuture<List<Integer>> createdUserIdList = new CompletableFuture<>();
         StreamObserver<UserInput> inputStream = streamingStub.createMultiple(new CreatedUserIdStreamObserver(createdUserIdList));
@@ -88,20 +89,22 @@ public class UserService extends UserServiceImplBase  {
         try {
             return createdUserIdList.get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new StreamExecutionException(e);
+            throw e.getCause();
         }
     }
 
+    @SneakyThrows
     public List<UserDTO> getAll() {
         CompletableFuture<List<UserDTO>> allUsersResponse = new CompletableFuture<>();
         streamingStub.getAll(Empty.newBuilder().build(), new GetAllUsersStreamObserver(allUsersResponse));
         try {
             return allUsersResponse.get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new StreamExecutionException(e);
+            throw e.getCause();
         }
     }
 
+    @SneakyThrows
     public void deleteMultiple(List<Integer> ids) {
         CompletableFuture<List<Integer>> future = new CompletableFuture<>();
 
@@ -118,7 +121,7 @@ public class UserService extends UserServiceImplBase  {
             List<Integer> deletedUsersIdList = future.get();
             log.info(deletedUsersIdList.toString());
         } catch (InterruptedException | ExecutionException e) {
-            throw new StreamExecutionException(e);
+            throw e.getCause();
         }
     }
 

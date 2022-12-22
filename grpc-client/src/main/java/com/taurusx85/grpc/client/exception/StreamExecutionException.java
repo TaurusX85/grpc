@@ -9,4 +9,8 @@ public class StreamExecutionException extends RuntimeException {
     public StreamExecutionException(Exception e) {
         super(e);
     }
+
+    public StreamExecutionException(Throwable t) {
+        super(t);
+    }
 }
