@@ -4,7 +4,7 @@ Java Spring Boot Grpc - an exhaustive example
 
  * if onNext() called fast after onCompleted() - can onCompleted() be called before big onNext() finished to process?
 
- lifecycle of stream
+ lifecycle of the stream
 
 
  concurrent calls to onNext():
