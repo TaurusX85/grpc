@@ -78,6 +78,7 @@ public class UserService extends UserServiceImplBase {
         return new DeletedUsersStreamObserver(responseObserver);
     }
 
+
     //    ====================== PRIVATE ==================
 
     private int createUser(String name) {

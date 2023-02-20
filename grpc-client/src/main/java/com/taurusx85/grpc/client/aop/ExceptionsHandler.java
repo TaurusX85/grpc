@@ -3,9 +3,6 @@ package com.taurusx85.grpc.client.aop;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.rpc.Code;
 import com.google.rpc.Status;
-import com.taurusx85.grpc.client.exception.AlreadyExistsException;
-import com.taurusx85.grpc.client.exception.StreamExecutionException;
-import com.taurusx85.grpc.common.AppContext;
 import io.grpc.StatusRuntimeException;
 import io.grpc.protobuf.StatusProto;
 import lombok.AllArgsConstructor;
@@ -13,7 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -25,7 +21,7 @@ import java.util.Map;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.google.rpc.Code.forNumber;
 import static com.taurusx85.grpc.common.AppContext.getRequestId;
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @Slf4j
 @ControllerAdvice

@@ -8,12 +8,11 @@ import com.taurusx85.grpc.client.config.GrpcChannelManager;
 import com.taurusx85.grpc.client.dto.input.NotificationInput;
 import com.taurusx85.grpc.client.dto.input.UserCreationInput;
 import com.taurusx85.grpc.client.dto.output.UserDTO;
-import com.taurusx85.grpc.client.exception.StreamExecutionException;
 import com.taurusx85.grpc.user.*;
-import com.taurusx85.grpc.user.UserServiceGrpc.UserServiceStub;
-import com.taurusx85.grpc.user.UserServiceGrpc.UserServiceImplBase;
-import com.taurusx85.grpc.user.UserServiceGrpc.UserServiceFutureStub;
 import com.taurusx85.grpc.user.UserServiceGrpc.UserServiceBlockingStub;
+import com.taurusx85.grpc.user.UserServiceGrpc.UserServiceFutureStub;
+import com.taurusx85.grpc.user.UserServiceGrpc.UserServiceImplBase;
+import com.taurusx85.grpc.user.UserServiceGrpc.UserServiceStub;
 import io.grpc.Context;
 import io.grpc.stub.StreamObserver;
 import lombok.AllArgsConstructor;
@@ -57,8 +56,8 @@ public class UserService extends UserServiceImplBase  {
 
     public UserDTO getById(Integer id) {
         UserMessage response = blockingStub.getById(UserId.newBuilder()
-                                                      .setId(id)
-                                                      .build());
+                                                          .setId(id)
+                                                          .build());
         return new UserDTO(response.getId(), response.getName());
     }
 
@@ -144,6 +143,9 @@ public class UserService extends UserServiceImplBase  {
     }
 
 
+    /**
+     *  Receive all users from server
+     */
     private static class GetAllUsersStreamObserver implements StreamObserver<UserMessage> {
 
         private CompletableFuture<List<UserDTO>> future;
@@ -154,6 +156,10 @@ public class UserService extends UserServiceImplBase  {
             this.users = new ArrayList<>();
         }
 
+        /**
+         * <p> Called when received a next user from server
+         * <p> Add each incoming user id to {@link #users} list
+         */
         @Override
         public void onNext(UserMessage value) {
             users.add(new UserDTO(value.getId(), value.getName()));
@@ -164,6 +170,9 @@ public class UserService extends UserServiceImplBase  {
             future.completeExceptionally(t);
         }
 
+        /**
+         * Called when server finished to send users. After last sent
+         */
         @Override
         public void onCompleted() {
             future.complete(users);
@@ -196,6 +205,10 @@ public class UserService extends UserServiceImplBase  {
         }
     }
 
+
+    /**
+     *  Receive created user ids from server
+     */
     private static class CreatedUserIdStreamObserver implements StreamObserver<UserId> {
 
         private CompletableFuture<List<Integer>> future;
@@ -206,6 +219,9 @@ public class UserService extends UserServiceImplBase  {
             this.createdUserIdList = new ArrayList<>();
         }
 
+        /**
+         * Add each incoming user id to {@link #createdUserIdList}
+         */
         @Override
         public void onNext(UserId value) {
             createdUserIdList.add(value.getId());
@@ -216,6 +232,9 @@ public class UserService extends UserServiceImplBase  {
             future.completeExceptionally(t);
         }
 
+        /**
+         * Called when server finished to create all users
+         */
         @Override
         public void onCompleted() {
             future.complete(createdUserIdList);

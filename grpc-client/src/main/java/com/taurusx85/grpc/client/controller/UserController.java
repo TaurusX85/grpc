@@ -25,28 +25,39 @@ public class UserController {
     }
 
 
-    // unidirectional synchronous
+    /**
+     * unidirectional synchronous
+     */
     @PostMapping
     public ResponseEntity<Integer> create(@RequestBody UserCreationInput input) {
         Integer id = userService.create(input.getName());
         return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 
-    // unidirectional synchronous
+
+    /**
+     * unidirectional synchronous
+     */
     @GetMapping("{id}")
     public ResponseEntity<UserDTO> getById(@PathVariable Integer id) {
         UserDTO user = userService.getById(id);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    // unidirectional asynchronous
+
+    /**
+     * unidirectional asynchronous
+     */
     @PostMapping("{id}/notify")
     public ResponseEntity notifyUser(@PathVariable Integer id, @RequestBody NotificationInput input) {
         userService.notifyUser(id, input);
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    // bidirectional streaming
+
+    /**
+     * bidirectional streaming
+     */
     @PostMapping("multiple")
     public ResponseEntity<List<Integer>> createMultiple(@RequestBody List<UserCreationInput> input) {
         List<Integer> ids = userService.createMultiple(input);
@@ -54,13 +65,19 @@ public class UserController {
         return new ResponseEntity<>(ids, HttpStatus.CREATED);
     }
 
-    // unidirectional server-side streaming
+
+    /**
+     * unidirectional server-side streaming
+     */
     @GetMapping("all")
     public ResponseEntity<List<UserDTO>> getAll() {
         return new ResponseEntity<>(userService.getAll(), HttpStatus.OK);
     }
 
-    // unidirectional client-side streaming
+
+    /**
+     * unidirectional client-side streaming
+     */
     @DeleteMapping("multiple")
     public ResponseEntity deleteMultiple(@RequestParam List<Integer> ids) {
         userService.deleteMultiple(ids);
