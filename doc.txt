@@ -38,3 +38,11 @@ HTTP2 allows client and server push messages in parallel in same TCP connection,
 
 
 
+TODO:
+    compare time:    GRPC + Protobuf  vs  REST + JSON
+
+ - HTTP1 vs HTTP 2
+ - Protobuf vs JSON
+ - main concepts
+ - stream for business, not for performance
+ - link to compare performance
