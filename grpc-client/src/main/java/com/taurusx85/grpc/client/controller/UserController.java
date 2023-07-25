@@ -36,7 +36,7 @@ public class UserController {
 
 
     /**
-     * unidirectional synchronous
+     * unidirectional synchronous  Operative0
      */
     @GetMapping("{id}")
     public ResponseEntity<UserDTO> getById(@PathVariable Integer id) {

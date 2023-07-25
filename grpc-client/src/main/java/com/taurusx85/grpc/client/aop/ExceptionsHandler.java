@@ -38,6 +38,13 @@ public class ExceptionsHandler extends ResponseEntityExceptionHandler {
     }
 
 
+    /**
+     * Catch StatusRuntimeException from call to gRPC client,
+     * extract response status and convert it to proper HttpCode
+     *
+     * @param e - Exception thrown from gRPC call
+     * @return ApiError
+     */
     @ExceptionHandler
     ResponseEntity<ApiError> handleStatusRuntimeException(StatusRuntimeException e) {
         log.error(e.toString());

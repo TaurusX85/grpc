@@ -7,6 +7,11 @@ import io.grpc.Status;
 import net.devh.boot.grpc.server.advice.GrpcAdvice;
 import net.devh.boot.grpc.server.advice.GrpcExceptionHandler;
 
+/**
+ * Catch exceptions thrown while processing gRPC calls
+ * and convert them to corresponding response Status
+ * to send to client
+ */
 @GrpcAdvice
 public class GrpcErrorAdvice {
 
