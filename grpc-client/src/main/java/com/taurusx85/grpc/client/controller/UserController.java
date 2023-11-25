@@ -26,7 +26,7 @@ public class UserController {
 
 
     /**
-     * unidirectional synchronous
+     * Unary synchronous call
      */
     @PostMapping
     public ResponseEntity<Integer> create(@RequestBody UserCreationInput input) {
@@ -36,7 +36,7 @@ public class UserController {
 
 
     /**
-     * unidirectional synchronous  Operative0
+     * Unary synchronous call
      */
     @GetMapping("{id}")
     public ResponseEntity<UserDTO> getById(@PathVariable Integer id) {
@@ -46,17 +46,17 @@ public class UserController {
 
 
     /**
-     * unidirectional asynchronous
+     * Unary asynchronous call
      */
     @PostMapping("{id}/notify")
     public ResponseEntity notifyUser(@PathVariable Integer id, @RequestBody NotificationInput input) {
         userService.notifyUser(id, input);
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 
     /**
-     * bidirectional streaming
+     * Bidirectional streaming
      */
     @PostMapping("multiple")
     public ResponseEntity<List<Integer>> createMultiple(@RequestBody List<UserCreationInput> input) {
@@ -67,7 +67,7 @@ public class UserController {
 
 
     /**
-     * unidirectional server-side streaming
+     * Unidirectional server-side streaming
      */
     @GetMapping("all")
     public ResponseEntity<List<UserDTO>> getAll() {
@@ -76,12 +76,12 @@ public class UserController {
 
 
     /**
-     * unidirectional client-side streaming
+     * Unidirectional client-side streaming
      */
     @DeleteMapping("multiple")
     public ResponseEntity deleteMultiple(@RequestParam List<Integer> ids) {
         userService.deleteMultiple(ids);
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
