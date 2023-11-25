@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+/**
+ *  Simulate DB access
+ */
 @Repository
 public class UserDAO {
 

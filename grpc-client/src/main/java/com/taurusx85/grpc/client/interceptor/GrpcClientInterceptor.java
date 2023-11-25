@@ -8,6 +8,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import static com.taurusx85.grpc.common.GrpcConstants.REQUEST_ID_HEADER_KEY;
 
+/**
+ *  Interceptor forwards RequestId from Context to header
+ */
 @Slf4j
 @GrpcGlobalClientInterceptor
 public class GrpcClientInterceptor implements ClientInterceptor {

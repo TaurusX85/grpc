@@ -8,6 +8,10 @@ import org.slf4j.MDC;
 
 import static com.taurusx85.grpc.common.GrpcConstants.*;
 
+/**
+ * Set up RequestId on Context before call
+ * and clear after
+ */
 @Slf4j
 @GrpcGlobalServerInterceptor
 public class GrpcServerInterceptor implements ServerInterceptor {
