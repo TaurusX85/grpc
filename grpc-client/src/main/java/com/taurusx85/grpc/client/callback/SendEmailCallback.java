@@ -2,12 +2,12 @@ package com.taurusx85.grpc.client.callback;
 
 import com.taurusx85.grpc.client.dto.input.NotificationInput;
 import com.taurusx85.grpc.common.AppContext;
-import com.taurusx85.grpc.common.CustomFutureCallback;
+import com.taurusx85.grpc.common.ForwardedContextFutureCallback;
 import com.taurusx85.grpc.user.UserMessage;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class SendEmailCallback extends CustomFutureCallback<UserMessage> {
+public class SendEmailCallback extends ForwardedContextFutureCallback<UserMessage> {
 
     private final NotificationInput notificationInput;
 

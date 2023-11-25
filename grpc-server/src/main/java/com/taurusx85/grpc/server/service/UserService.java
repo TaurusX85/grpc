@@ -54,6 +54,7 @@ public class UserService extends UserServiceImplBase {
         responseObserver.onNext(userDAO.getById(request.getId())
                                        .map(this::toUser)
                                        .orElseThrow(() -> new EntityNotFoundException("User with id: " + request.getId() + " not exists")));
+        log.info("User found");
         responseObserver.onCompleted();
     }
 
@@ -64,14 +65,17 @@ public class UserService extends UserServiceImplBase {
 
     @Override
     public void getAll(Empty request, StreamObserver<UserMessage> responseObserver) {
+        log.info("All users requested");
         try {
             for (User user : userDAO.getAll()) {
+                log.info("User sent");
                 responseObserver.onNext(toUser(user));
             }
         } catch (Exception e) {
             responseObserver.onError(e);
         }
         responseObserver.onCompleted();
+        log.info("All users sent");
     }
 
     @Override

@@ -73,7 +73,6 @@ public class UserService extends UserServiceImplBase  {
             ListenableFuture<UserMessage> response = futureStub.getById(UserId.newBuilder()
                                                                               .setId(userId)
                                                                               .build());
-            response.addListener(() -> log.info("abr"), executorService);
             Futures.addCallback(response, new SendEmailCallback(input), executorService);
         } finally {
             newContext.detach(origContext);
@@ -118,13 +117,16 @@ public class UserService extends UserServiceImplBase  {
             stream.onNext(UserId.newBuilder()
                                 .setId(userId)
                                 .build());
+            log.info("Removing user: " + userId);
         }
         stream.onCompleted();
+        log.info("All users sent for removal");
 
         try {
             List<Integer> deletedUsersIdList = future.get();
-            log.info(deletedUsersIdList.toString());
+            log.info("All users removed: " + deletedUsersIdList.toString());
         } catch (InterruptedException | ExecutionException e) {
+            log.error(e.toString());
             throw e.getCause();
         }
     }

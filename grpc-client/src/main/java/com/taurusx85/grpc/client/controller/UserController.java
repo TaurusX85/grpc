@@ -51,6 +51,7 @@ public class UserController {
     @PostMapping("{id}/notify")
     public ResponseEntity notifyUser(@PathVariable Integer id, @RequestBody NotificationInput input) {
         userService.notifyUser(id, input);
+        log.info("Notifications sent");
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -71,7 +72,10 @@ public class UserController {
      */
     @GetMapping("all")
     public ResponseEntity<List<UserDTO>> getAll() {
-        return new ResponseEntity<>(userService.getAll(), HttpStatus.OK);
+        log.info("All users requested");
+        List<UserDTO> all = userService.getAll();
+        log.info("All users received");
+        return new ResponseEntity<>(all, HttpStatus.OK);
     }
 
 
@@ -80,8 +84,15 @@ public class UserController {
      */
     @DeleteMapping("multiple")
     public ResponseEntity deleteMultiple(@RequestParam List<Integer> ids) {
+        log.info("Going to remove multiple users");
         userService.deleteMultiple(ids);
+        log.info("Users removed");
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+
+    // TODO:
+    //  Call with deadline...
+    //  Call and cancel...
 
 }

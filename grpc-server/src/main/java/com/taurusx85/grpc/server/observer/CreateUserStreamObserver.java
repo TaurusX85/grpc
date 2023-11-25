@@ -6,6 +6,7 @@ import com.taurusx85.grpc.user.UserId;
 import com.taurusx85.grpc.user.UserInput;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.expression.common.ExpressionUtils;
 
 @Slf4j
 public class CreateUserStreamObserver implements StreamObserver<UserInput> {
@@ -25,6 +26,7 @@ public class CreateUserStreamObserver implements StreamObserver<UserInput> {
             responseObserver.onNext(UserId.newBuilder()
                                           .setId(id)
                                           .build());
+            log.info("User created: " + id);
         } catch (AlreadyExistsException e) {
             log.error(e.toString());
             responseObserver.onError(e);
@@ -34,10 +36,12 @@ public class CreateUserStreamObserver implements StreamObserver<UserInput> {
     @Override
     public void onError(Throwable t) {
         responseObserver.onError(t);
+        log.error("Exception: " + t);
     }
 
     @Override
     public void onCompleted() {
         responseObserver.onCompleted();
+        log.info("Completed");
     }
 }

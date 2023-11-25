@@ -3,6 +3,7 @@ package com.taurusx85.grpc.client.observer;
 import com.taurusx85.grpc.client.dto.output.UserDTO;
 import com.taurusx85.grpc.user.UserMessage;
 import io.grpc.stub.StreamObserver;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  *  Receive all users from server
  */
+@Slf4j
 public class GetAllUsersStreamObserver implements StreamObserver<UserMessage> {
 
     private final CompletableFuture<List<UserDTO>> future;
@@ -29,11 +31,13 @@ public class GetAllUsersStreamObserver implements StreamObserver<UserMessage> {
     @Override
     public void onNext(UserMessage value) {
         users.add(new UserDTO(value.getId(), value.getName()));
+        log.info("User received");
     }
 
     @Override
     public void onError(Throwable t) {
         future.completeExceptionally(t);
+        log.error("Exception: " + t);
     }
 
     /**
@@ -42,5 +46,6 @@ public class GetAllUsersStreamObserver implements StreamObserver<UserMessage> {
     @Override
     public void onCompleted() {
         future.complete(users);
+        log.info("All users received");
     }
 }

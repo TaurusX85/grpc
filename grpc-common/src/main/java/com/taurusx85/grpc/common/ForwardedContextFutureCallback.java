@@ -6,12 +6,12 @@ import org.slf4j.MDC;
 
 import static com.taurusx85.grpc.common.GrpcConstants.REQUEST_ID;
 
-public abstract class CustomFutureCallback<T> implements FutureCallback<T> {
+public abstract class ForwardedContextFutureCallback<T> implements FutureCallback<T> {
 
     protected final String requestId;
 
 
-    public CustomFutureCallback(String requestId) {
+    public ForwardedContextFutureCallback(String requestId) {
         this.requestId = requestId;
     }
 

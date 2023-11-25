@@ -24,6 +24,7 @@ public class DeletedUsersStreamObserver implements StreamObserver<UserId> {
     @Override
     public void onNext(UserId userId) {
         try {
+            log.info("Removing user and adding id to list : " + userId);
             boolean removed = userDAO.removeById(userId.getId());
             if (removed)
                 removedUsersIdList.add(userId.getId());
@@ -44,6 +45,7 @@ public class DeletedUsersStreamObserver implements StreamObserver<UserId> {
         responseObserver.onNext(DeletedUsers.newBuilder()
                                             .addAllIds(removedUsersIdList)
                                             .build());
+        log.info("Sending list of removed users");
         responseObserver.onCompleted();
     }
 }
