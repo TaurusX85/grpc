@@ -27,6 +27,7 @@ public class UserController {
 
     /**
      * Unary synchronous call
+     * In case of error - send back a status explicitly
      */
     @PostMapping
     public ResponseEntity<Integer> create(@RequestBody UserCreationInput input) {
