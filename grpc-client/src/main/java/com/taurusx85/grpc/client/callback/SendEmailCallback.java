@@ -1,24 +1,30 @@
 package com.taurusx85.grpc.client.callback;
 
-import com.google.common.util.concurrent.FutureCallback;
 import com.taurusx85.grpc.client.dto.input.NotificationInput;
+import com.taurusx85.grpc.common.AppContext;
+import com.taurusx85.grpc.common.CustomFutureCallback;
 import com.taurusx85.grpc.user.UserMessage;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@AllArgsConstructor
-public class SendEmailCallback implements FutureCallback<UserMessage> {
+public class SendEmailCallback extends CustomFutureCallback<UserMessage> {
 
-    private NotificationInput notificationInput;
+    private final NotificationInput notificationInput;
+
+    public SendEmailCallback(NotificationInput notificationInput) {
+        super(AppContext.getRequestId());
+        this.notificationInput = notificationInput;
+    }
+
 
     @Override
-    public void onSuccess(UserMessage userMessage) {
+    protected void success(UserMessage userMessage) {
         log.info("Sending email to: " + userMessage.getName() + "; Message: " + notificationInput.getMessage());
     }
 
     @Override
-    public void onFailure(Throwable t) {
+    protected void failure(Throwable t) {
         log.error("Error fetching user: " + t.getMessage());
     }
+
 }

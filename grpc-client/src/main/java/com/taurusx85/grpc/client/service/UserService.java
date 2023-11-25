@@ -73,6 +73,7 @@ public class UserService extends UserServiceImplBase  {
             ListenableFuture<UserMessage> response = futureStub.getById(UserId.newBuilder()
                                                                               .setId(userId)
                                                                               .build());
+            response.addListener(() -> log.info("abr"), executorService);
             Futures.addCallback(response, new SendEmailCallback(input), executorService);
         } finally {
             newContext.detach(origContext);
