@@ -41,18 +41,50 @@ public class GrpcServerInterceptor implements ServerInterceptor {
             this.grpcMethodName = grpcMethodName;
         }
 
+        /**
+         *      -------------------------- Blocking -------------------------------------
+         *
+         *         onMessage               * 1
+         *         onMessage.finally       * 1
+         *         onHalfClose             * 1
+         *         SERVICE                 * 1
+         *         onHalfClose.finally     * 1
+         *         onComplete              * 1
+         *
+         *     -------------------------- Streaming -------------------------------------
+         *
+         *         onMessage			   * N
+         *         SERVICE				   * N
+         *         onMessage.finally	   * N
+         *         onHalfClose             * 1
+         *         onHalfClose.finally     * 1
+         *         onComplete              * 1
+         */
+
         @Override
         public void onHalfClose() {                 //  If stream - need to use  'onMessage'
-            Context previous = setUpContext();
+            Context attachedContext = setUpContext();
             try {
-                log.debug("Called: '" + grpcMethodName);
                 super.onHalfClose();
             } catch (Exception e) {
                 log.error(e.toString());
             } finally {
-                cleanContext(previous);
+                cleanContext(attachedContext);
             }
         }
+
+        public void onMessage(ReqT message) {
+            Context attachedContext = setUpContext();
+            try {
+                log.debug("Called: '" + grpcMethodName);
+                super.onMessage(message);
+            } catch (Exception e) {
+                log.error(e.toString());
+            } finally {
+                cleanContext(attachedContext);
+            }
+        }
+
 
 
         private void cleanContext(Context previous) {
@@ -62,10 +94,10 @@ public class GrpcServerInterceptor implements ServerInterceptor {
         }
 
         private Context setUpContext() {
-            Context previous = context.attach();
+            Context attachedContext = context.attach();
             AppContext.setRequestId(REQUEST_CONTEXT.get());
             MDC.put(REQUEST_ID, AppContext.getRequestId());
-            return previous;
+            return attachedContext;
         }
     }
 
