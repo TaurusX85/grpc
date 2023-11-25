@@ -3,13 +3,13 @@ plugins {
     id 'org.springframework.boot' version '2.5.4'
 }
 
-sourceCompatibility = '11'
-
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
 }
+
+sourceCompatibility = '17'
 
 repositories {
     mavenCentral()
