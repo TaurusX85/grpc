@@ -30,14 +30,6 @@ public class ExceptionsHandler extends ResponseEntityExceptionHandler {
     private final Map<Code, HttpStatus> codeToHttpStatusMap = Map.of(Code.ALREADY_EXISTS, HttpStatus.CONFLICT,
                                                                      Code.NOT_FOUND,      HttpStatus.NOT_FOUND);
 
-
-    @ExceptionHandler
-    ResponseEntity<ApiError> handleCommonException(Exception e) {
-        ApiError apiError = new ApiError(e.getMessage(), getRequestId());
-        return new ResponseEntity<>(apiError, INTERNAL_SERVER_ERROR);
-    }
-
-
     /**
      * Catch StatusRuntimeException from call to gRPC client,
      * extract response status and convert it to proper HttpCode
@@ -60,6 +52,13 @@ public class ExceptionsHandler extends ResponseEntityExceptionHandler {
         apiError = new ApiError(status.getMessage(), getRequestId());
         return new ResponseEntity<>(apiError, httpStatus);
     }
+
+    @ExceptionHandler
+    ResponseEntity<ApiError> handleCommonException(Exception e) {
+        ApiError apiError = new ApiError(e.getMessage(), getRequestId());
+        return new ResponseEntity<>(apiError, INTERNAL_SERVER_ERROR);
+    }
+
 
 
     @Getter

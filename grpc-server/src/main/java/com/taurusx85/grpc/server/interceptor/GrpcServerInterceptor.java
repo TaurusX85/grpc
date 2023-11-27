@@ -61,8 +61,9 @@ public class GrpcServerInterceptor implements ServerInterceptor {
          *         onComplete              * 1
          */
 
+        //  If stream - need to use  'onMessage', otherwise 'onHalfClose' is enough
         @Override
-        public void onHalfClose() {                 //  If stream - need to use  'onMessage'
+        public void onHalfClose() {
             Context attachedContext = setUpContext();
             try {
                 super.onHalfClose();

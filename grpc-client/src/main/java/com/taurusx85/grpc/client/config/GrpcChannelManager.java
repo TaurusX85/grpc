@@ -19,8 +19,8 @@ public class GrpcChannelManager {
     private final ManagedChannel serverChannel;
 
 
-    public GrpcChannelManager(@Value("${local-server.url}") String url,
-                              @Value("${local-server.port}") int port) {
+    public GrpcChannelManager(@Value("${grpc-server.url}") String url,
+                              @Value("${grpc-server.port}") int port) {
         this.serverChannel = ManagedChannelBuilder.forAddress(url, port)
                                                   .intercept(new GrpcClientInterceptor())
                                                   .usePlaintext()

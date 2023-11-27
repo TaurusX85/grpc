@@ -36,7 +36,7 @@ import java.util.concurrent.Executors;
 @Service
 public class UserService extends UserServiceImplBase  {
 
-    @GrpcClient("local-server")
+    @GrpcClient("target-server")
     private UserServiceBlockingStub blockingStub;
     private UserServiceFutureStub futureStub;
     private UserServiceStub streamingStub;
