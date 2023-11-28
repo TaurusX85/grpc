@@ -17,18 +17,20 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.Map;
+import java.util.concurrent.CancellationException;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.google.rpc.Code.forNumber;
 import static com.taurusx85.grpc.common.AppContext.getRequestId;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.*;
 
 @Slf4j
 @ControllerAdvice
 public class ExceptionsHandler extends ResponseEntityExceptionHandler {
 
     private final Map<Code, HttpStatus> codeToHttpStatusMap = Map.of(Code.ALREADY_EXISTS, HttpStatus.CONFLICT,
-                                                                     Code.NOT_FOUND,      HttpStatus.NOT_FOUND);
+                                                                     Code.NOT_FOUND,      HttpStatus.NOT_FOUND,
+                                                                     Code.DEADLINE_EXCEEDED, HttpStatus.REQUEST_TIMEOUT);
 
     /**
      * Catch StatusRuntimeException from call to gRPC client,
@@ -51,6 +53,12 @@ public class ExceptionsHandler extends ResponseEntityExceptionHandler {
         HttpStatus httpStatus = codeToHttpStatusMap.getOrDefault(responseCode, HttpStatus.INTERNAL_SERVER_ERROR);
         apiError = new ApiError(status.getMessage(), getRequestId());
         return new ResponseEntity<>(apiError, httpStatus);
+    }
+
+    @ExceptionHandler
+    ResponseEntity<ApiError> handleCancellationException(CancellationException e) {
+        ApiError apiError = new ApiError(e.getMessage(), getRequestId());
+        return new ResponseEntity<>(apiError, I_AM_A_TEAPOT);
     }
 
     @ExceptionHandler

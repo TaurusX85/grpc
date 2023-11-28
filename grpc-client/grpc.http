@@ -8,16 +8,9 @@ Accept: application/json
   "name": "John"
 }
 
-<> 2023-11-25T173347.201.json
-<> 2023-11-25T173205.201.json
-<> 2023-11-25T173024.201.json
-
-
-
 
 ###    ===================== GET BY ID =====================
 GET http://localhost:8080/user/1158666086
-
 
 
 
@@ -28,7 +21,6 @@ Content-Type: application/json
 {
   "message": "Hello, world!"
 }
-
 
 
 ###   ===================== CREATE MULTIPLE =====================
@@ -47,21 +39,21 @@ Content-Type: application/json
   }
 ]
 
-<> 2023-11-25T174207.201.json
-<> 2023-11-25T173950.201.json
-<> 2023-11-25T173659.409.json
-<> 2023-11-25T171118.201.json
-
-
-
 
 ###    ===================== GET ALL =====================
 GET http://localhost:8080/user/all
 
-<> 2023-11-25T174216.200.json
-<> 2023-11-25T165626.200.json
-<> 2023-11-25T165454.200.json
-
 
 ###    ===================== DELETE MULTIPLE =====================
 DELETE http://localhost:8080/user/multiple?ids=1594002406,1321235856,1313852230
+
+
+###    ===================== GET BY ID WITH DEADLINE =====================
+GET http://localhost:8080/user/deadline
+
+
+###    ===================== GET ALL AND CANCEL =====================
+GET http://localhost:8080/user/cancel
+
+
+

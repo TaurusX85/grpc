@@ -27,10 +27,10 @@ import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
+
+import static com.taurusx85.grpc.common.GrpcConstants.CANCEL;
+import static com.taurusx85.grpc.common.GrpcConstants.DEADLINE;
 
 @Slf4j
 @Service
@@ -131,5 +131,24 @@ public class UserService extends UserServiceImplBase  {
         }
     }
 
+
+    public UserDTO getByIdWithDeadline() {
+        UserMessage userMessage = blockingStub.withDeadlineAfter(3, TimeUnit.SECONDS)
+                                              .getById(UserId.newBuilder()
+                                                             .setId(DEADLINE)
+                                                             .build());
+        return new UserDTO(userMessage.getId(), userMessage.getName());
+    }
+    @SneakyThrows
+    public UserDTO getByIdAndCancel() {
+        ListenableFuture<UserMessage> future = futureStub.getById(UserId.newBuilder()
+                                                                        .setId(CANCEL)
+                                                                        .build());
+        Thread.sleep(1_000);
+        future.cancel(true);
+        UserMessage userMessage = future.get();
+        log.info("getByIdAndCancel continue..");
+        return new UserDTO(userMessage.getId(), userMessage.getName());
+    }
 
 }

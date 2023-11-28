@@ -14,15 +14,24 @@ import com.taurusx85.grpc.user.UserId;
 import com.taurusx85.grpc.user.UserInput;
 import com.taurusx85.grpc.user.UserMessage;
 import com.taurusx85.grpc.user.UserServiceGrpc.UserServiceImplBase;
+import io.grpc.Context;
 import io.grpc.protobuf.StatusProto;
+import io.grpc.stub.ServerCallStreamObserver;
 import io.grpc.stub.StreamObserver;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
+
+import java.util.concurrent.Executors;
+
+import static com.taurusx85.grpc.common.GrpcConstants.CANCEL;
+import static com.taurusx85.grpc.common.GrpcConstants.DEADLINE;
 
 @Slf4j
 @GrpcService
 public class UserService extends UserServiceImplBase {
 
+    public static final int SLEEP_TIMEOUT = 3_000;
     private final UserDAO userDAO;
 
     public UserService(UserDAO userDAO) {
@@ -49,8 +58,24 @@ public class UserService extends UserServiceImplBase {
         }
     }
 
+    @SneakyThrows
     @Override
     public void getById(UserId request, StreamObserver<UserMessage> responseObserver) {
+        if (request.getId() == DEADLINE) {
+            Context.current()
+                   .getDeadline()
+                   .runOnExpiration(() -> log.warn("DEADLINE EXCEEDED"), Executors.newSingleThreadScheduledExecutor());
+            Thread.sleep(SLEEP_TIMEOUT);
+            return;
+        }
+
+        if (request.getId() == CANCEL) {
+            ((ServerCallStreamObserver) responseObserver).setOnCancelHandler(() -> log.warn("CALL WAS CANCELLED"));
+            Thread.sleep(SLEEP_TIMEOUT);
+            return;
+        }
+
+        log.info("Searching for user...");
         responseObserver.onNext(userDAO.getById(request.getId())
                                        .map(this::toUser)
                                        .orElseThrow(() -> new EntityNotFoundException("User with id: " + request.getId() + " not exists")));

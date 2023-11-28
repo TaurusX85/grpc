@@ -91,9 +91,14 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @GetMapping("deadline")
+    public ResponseEntity<UserDTO> getAllWithDeadline() {
+        return new ResponseEntity<>(userService.getByIdWithDeadline(), HttpStatus.OK);
+    }
 
-    // TODO:
-    //  Call with deadline...
-    //  Call and cancel...
+    @GetMapping("cancel")
+    public ResponseEntity<UserDTO> getByIdAndCancel() {
+        return new ResponseEntity<>(userService.getByIdAndCancel(), HttpStatus.OK);
+    }
 
 }
