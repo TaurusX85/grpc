@@ -92,13 +92,13 @@ public class UserController {
     }
 
     @GetMapping("deadline")
-    public ResponseEntity<UserDTO> getAllWithDeadline() {
-        return new ResponseEntity<>(userService.getByIdWithDeadline(), HttpStatus.OK);
+    public ResponseEntity<UserDTO> getByNameWithDeadline() {
+        return new ResponseEntity<>(userService.getByNameWithDeadline(), HttpStatus.OK);
     }
 
     @GetMapping("cancel")
-    public ResponseEntity<UserDTO> getByIdAndCancel() {
-        return new ResponseEntity<>(userService.getByIdAndCancel(), HttpStatus.OK);
+    public ResponseEntity<UserDTO> getByNameAndCancel() {
+        return new ResponseEntity<>(userService.getByNameAndCancel(), HttpStatus.OK);
     }
 
 }

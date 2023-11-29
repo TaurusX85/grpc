@@ -3,6 +3,7 @@ package com.taurusx85.grpc.client.service;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.protobuf.Empty;
+import com.google.protobuf.StringValue;
 import com.taurusx85.grpc.client.callback.SendEmailCallback;
 import com.taurusx85.grpc.client.config.GrpcChannelManager;
 import com.taurusx85.grpc.client.dto.input.NotificationInput;
@@ -11,10 +12,7 @@ import com.taurusx85.grpc.client.dto.output.UserDTO;
 import com.taurusx85.grpc.client.observer.CreatedUserIdStreamObserver;
 import com.taurusx85.grpc.client.observer.DeletedUsersStreamObserver;
 import com.taurusx85.grpc.client.observer.GetAllUsersStreamObserver;
-import com.taurusx85.grpc.user.UserId;
-import com.taurusx85.grpc.user.UserInput;
-import com.taurusx85.grpc.user.UserMessage;
-import com.taurusx85.grpc.user.UserServiceGrpc;
+import com.taurusx85.grpc.user.*;
 import com.taurusx85.grpc.user.UserServiceGrpc.UserServiceBlockingStub;
 import com.taurusx85.grpc.user.UserServiceGrpc.UserServiceFutureStub;
 import com.taurusx85.grpc.user.UserServiceGrpc.UserServiceImplBase;
@@ -25,21 +23,23 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.concurrent.*;
 
-import static com.taurusx85.grpc.common.GrpcConstants.CANCEL;
-import static com.taurusx85.grpc.common.GrpcConstants.DEADLINE;
 
 @Slf4j
 @Service
 public class UserService extends UserServiceImplBase  {
 
+    public static final int ONE_SECOND = 1_000;
     @GrpcClient("target-server")
     private UserServiceBlockingStub blockingStub;
     private UserServiceFutureStub futureStub;
     private UserServiceStub streamingStub;
+    private RestTemplate restTemplate;
+
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -47,6 +47,7 @@ public class UserService extends UserServiceImplBase  {
     public UserService(GrpcChannelManager channelManager) {
         this.futureStub = UserServiceGrpc.newFutureStub(channelManager.getServerChannel());
         this.streamingStub = UserServiceGrpc.newStub(channelManager.getServerChannel());
+        this.restTemplate = new RestTemplate();
     }
 
 
@@ -131,21 +132,19 @@ public class UserService extends UserServiceImplBase  {
         }
     }
 
-
-    public UserDTO getByIdWithDeadline() {
+    public UserDTO getByNameWithDeadline() {
         UserMessage userMessage = blockingStub.withDeadlineAfter(3, TimeUnit.SECONDS)
-                                              .getById(UserId.newBuilder()
-                                                             .setId(DEADLINE)
-                                                             .build());
+                                              .getByName(NameInput.newBuilder()
+                                                                  .setName(StringValue.of("Tom"))
+                                                                  .build());
         return new UserDTO(userMessage.getId(), userMessage.getName());
     }
+
     @SneakyThrows
-    public UserDTO getByIdAndCancel() {
-        ListenableFuture<UserMessage> future = futureStub.getById(UserId.newBuilder()
-                                                                        .setId(CANCEL)
-                                                                        .build());
-        Thread.sleep(1_000);
-        future.cancel(true);
+    public UserDTO getByNameAndCancel() {
+        ListenableFuture<UserMessage> future = futureStub.getByName(NameInput.newBuilder().build());
+        Thread.sleep(ONE_SECOND);
+        future.cancel(false);
         UserMessage userMessage = future.get();
         log.info("getByIdAndCancel continue..");
         return new UserDTO(userMessage.getId(), userMessage.getName());

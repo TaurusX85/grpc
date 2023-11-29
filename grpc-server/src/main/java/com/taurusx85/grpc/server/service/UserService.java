@@ -9,10 +9,7 @@ import com.taurusx85.grpc.server.exception.AlreadyExistsException;
 import com.taurusx85.grpc.server.exception.EntityNotFoundException;
 import com.taurusx85.grpc.server.observer.CreateUserStreamObserver;
 import com.taurusx85.grpc.server.observer.DeletedUsersStreamObserver;
-import com.taurusx85.grpc.user.DeletedUsers;
-import com.taurusx85.grpc.user.UserId;
-import com.taurusx85.grpc.user.UserInput;
-import com.taurusx85.grpc.user.UserMessage;
+import com.taurusx85.grpc.user.*;
 import com.taurusx85.grpc.user.UserServiceGrpc.UserServiceImplBase;
 import io.grpc.Context;
 import io.grpc.protobuf.StatusProto;
@@ -23,9 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 
 import java.util.concurrent.Executors;
-
-import static com.taurusx85.grpc.common.GrpcConstants.CANCEL;
-import static com.taurusx85.grpc.common.GrpcConstants.DEADLINE;
 
 @Slf4j
 @GrpcService
@@ -61,21 +55,6 @@ public class UserService extends UserServiceImplBase {
     @SneakyThrows
     @Override
     public void getById(UserId request, StreamObserver<UserMessage> responseObserver) {
-        if (request.getId() == DEADLINE) {
-            Context.current()
-                   .getDeadline()
-                   .runOnExpiration(() -> log.warn("DEADLINE EXCEEDED"), Executors.newSingleThreadScheduledExecutor());
-            Thread.sleep(SLEEP_TIMEOUT);
-            return;
-        }
-
-        if (request.getId() == CANCEL) {
-            ((ServerCallStreamObserver) responseObserver).setOnCancelHandler(() -> log.warn("CALL WAS CANCELLED"));
-            Thread.sleep(SLEEP_TIMEOUT);
-            return;
-        }
-
-        log.info("Searching for user...");
         responseObserver.onNext(userDAO.getById(request.getId())
                                        .map(this::toUser)
                                        .orElseThrow(() -> new EntityNotFoundException("User with id: " + request.getId() + " not exists")));
@@ -114,6 +93,22 @@ public class UserService extends UserServiceImplBase {
                           .setId(foundUser.getId())
                           .setName(foundUser.getName())
                           .build();
+    }
+
+    @SneakyThrows
+    @Override
+    public void getByName(NameInput request, StreamObserver<UserMessage> responseObserver) {
+        if (request.hasName()) {
+            Context.current()
+                   .getDeadline()
+                   .runOnExpiration(() -> log.warn("DEADLINE EXCEEDED"), Executors.newSingleThreadScheduledExecutor());
+            Thread.sleep(SLEEP_TIMEOUT);
+            return;
+        }
+
+        ((ServerCallStreamObserver) responseObserver).setOnCancelHandler(() -> log.warn("CALL WAS CANCELLED"));
+        Thread.sleep(SLEEP_TIMEOUT);
+        log.info("Searching for user...");
     }
 
 }

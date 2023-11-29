@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
 
 package taurusx85;
 
@@ -24,9 +25,14 @@ message DeletedUsers {
     repeated int32 ids = 1;
 }
 
+message NameInput {
+    google.protobuf.StringValue name = 1;
+}
+
 service UserService {
     rpc create(UserInput) returns (UserId);
     rpc getById(UserId) returns (UserMessage);
+    rpc getByName(NameInput) returns (UserMessage);
 
     rpc createMultiple(stream UserInput) returns (stream UserId);
     rpc getAll(google.protobuf.Empty) returns (stream UserMessage);
