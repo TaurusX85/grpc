@@ -146,7 +146,7 @@ public class UserService extends UserServiceImplBase  {
         Thread.sleep(ONE_SECOND);
         future.cancel(false);
         UserMessage userMessage = future.get();
-        log.info("getByIdAndCancel continue..");
+        log.info("getByNameAndCancel finished");
         return new UserDTO(userMessage.getId(), userMessage.getName());
     }
 

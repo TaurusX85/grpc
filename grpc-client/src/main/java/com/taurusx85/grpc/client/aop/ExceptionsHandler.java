@@ -28,8 +28,8 @@ import static org.springframework.http.HttpStatus.*;
 @ControllerAdvice
 public class ExceptionsHandler extends ResponseEntityExceptionHandler {
 
-    private final Map<Code, HttpStatus> codeToHttpStatusMap = Map.of(Code.ALREADY_EXISTS, HttpStatus.CONFLICT,
-                                                                     Code.NOT_FOUND,      HttpStatus.NOT_FOUND,
+    private final Map<Code, HttpStatus> codeToHttpStatusMap = Map.of(Code.ALREADY_EXISTS,    HttpStatus.CONFLICT,
+                                                                     Code.NOT_FOUND,         HttpStatus.NOT_FOUND,
                                                                      Code.DEADLINE_EXCEEDED, HttpStatus.REQUEST_TIMEOUT);
 
     /**
